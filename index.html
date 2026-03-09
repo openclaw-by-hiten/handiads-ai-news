@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HandiAds Opportunity Radar</title>
+
+<style>
+body{
+font-family: Arial;
+margin:0;
+background:#0f172a;
+color:white;
+}
+
+.card{
+height:100vh;
+padding:25px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+border-bottom:1px solid #333;
+}
+
+.title{
+font-size:24px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.summary{
+font-size:18px;
+line-height:1.4;
+}
+
+.source{
+margin-top:20px;
+color:#38bdf8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="news"></div>
+
+<script>
+
+async function loadNews(){
+
+let res = await fetch("news.json");
+let data = await res.json();
+
+let container = document.getElementById("news");
+
+data.forEach(n=>{
+
+container.innerHTML += `
+<div class="card">
+<div class="title">${n.title}</div>
+<div class="summary">${n.summary}</div>
+<a class="source" href="${n.url}" target="_blank">Read Full Article</a>
+</div>
+`
+
+})
+
+}
+
+loadNews()
+
+</script>
+
+</body>
+</html>
