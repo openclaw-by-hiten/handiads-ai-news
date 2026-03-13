@@ -1,71 +1,153 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HandiAds Opportunity Radar</title>
+<title>AI News</title>
 
 <style>
+
 body{
-font-family: Arial;
 margin:0;
-background:#0f172a;
+font-family:Arial;
+background:#0c1c2c;
 color:white;
+overflow:hidden;
+}
+
+#app{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .card{
-height:100vh;
+position:absolute;
+width:90%;
+max-width:500px;
+background:#13283f;
 padding:25px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-border-bottom:1px solid #333;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
+transition:transform 0.4s;
 }
 
-.title{
-font-size:24px;
-font-weight:bold;
-margin-bottom:15px;
+h2{
+margin-top:0;
 }
 
-.summary{
-font-size:18px;
-line-height:1.4;
+p{
+line-height:1.5;
 }
 
 .source{
-margin-top:20px;
-color:#38bdf8;
+font-size:13px;
+opacity:0.7;
+margin-top:10px;
+}
+
+.read{
+display:inline-block;
+margin-top:15px;
+color:#3ec8ff;
+text-decoration:none;
+font-weight:bold;
+}
+
+.indicator{
+position:fixed;
+bottom:20px;
+width:100%;
+text-align:center;
+font-size:14px;
+opacity:0.6;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div id="news"></div>
+<div id="app"></div>
+
+<div class="indicator">
+Swipe ↑ for next news
+</div>
 
 <script>
 
+let news=[]
+let current=0
+let startY=0
+
 async function loadNews(){
 
-let res = await fetch("news.json");
-let data = await res.json();
+try{
 
-let container = document.getElementById("news");
+const res = await fetch("news.json")
+news = await res.json()
 
-data.forEach(n=>{
+showCard()
 
-container.innerHTML += `
-<div class="card">
-<div class="title">${n.title}</div>
-<div class="summary">${n.summary}</div>
-<a class="source" href="${n.url}" target="_blank">Read Full Article</a>
-</div>
-`
+}catch(e){
 
-})
+document.getElementById("app").innerHTML =
+"<h2>Failed to load news</h2>"
 
 }
+
+}
+
+function showCard(){
+
+const app=document.getElementById("app")
+app.innerHTML=""
+
+if(current>=news.length){
+app.innerHTML="<h2>No more news</h2>"
+return
+}
+
+const article=news[current]
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<h2>${article.title}</h2>
+<p>${article.description}</p>
+<div class="source">${article.source || ""}</div>
+<a class="read" href="${article.url}" target="_blank">
+Read Full Article →
+</a>
+`
+
+app.appendChild(card)
+
+}
+
+document.addEventListener("touchstart",e=>{
+startY=e.touches[0].clientY
+})
+
+document.addEventListener("touchend",e=>{
+
+let endY=e.changedTouches[0].clientY
+
+if(startY-endY>50){
+current++
+showCard()
+}
+
+if(endY-startY>50){
+current--
+if(current<0) current=0
+showCard()
+}
+
+})
 
 loadNews()
 
